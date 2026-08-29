@@ -1,5 +1,7 @@
 "use client";
+import Image from "next/image";
 import { Search } from "lucide-react";
+import Data from "@/app/shared/Data";
 
 export default function Home() {
   return (
@@ -32,6 +34,19 @@ export default function Home() {
             Search
           </button>
         </div>
+      </div>
+      <div className="grid grid-cols-3 gap-10 mt-10">
+        {Data.map((item) => (
+          <div key={item.id} onClick={() => console.log(item.name)}>
+            <Image
+              src={item.image}
+              alt="item"
+              width={50}
+              height={50}
+              className="hover:scale-125"
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
