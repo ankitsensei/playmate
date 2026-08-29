@@ -1,21 +1,32 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDz02aY-229xTTU5zXeJpTXAwM4bQVEIio",
-  authDomain: "playmate-f23cf.firebaseapp.com",
-  projectId: "playmate-f23cf",
-  storageBucket: "playmate-f23cf.firebasestorage.app",
-  messagingSenderId: "98489341365",
-  appId: "1:98489341365:web:4c79f237a9ce4af03eb5fc",
-  measurementId: "G-581WNFCN2E",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+export const db = getFirestore(app);
+
+export interface Post {
+  id: string;
+  title: string;
+  desc: string;
+}
+
+export async function getPosts(): Promise<Post[]> {
+  const postsCollection = collection(db, "posts");
+
+  const postsSnapshot = await getDocs(postsCollection);
+
+  return postsSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as Omit<Post, "id">),
+  }));
+}

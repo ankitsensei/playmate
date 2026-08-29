@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Search } from "lucide-react";
 import Data from "@/app/shared/Data";
+import GetPost from "@/app/shared/GetPost";
 
 export default function Home() {
   return (
@@ -47,6 +48,9 @@ export default function Home() {
             />
           </div>
         ))}
+      </div>
+      <div>
+        <GetPost />
       </div>
     </div>
   );
