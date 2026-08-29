@@ -1,6 +1,8 @@
 "use client";
-
-import { useSession, signIn, signOut } from "next-auth/react";
+import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
+import SignInButton from "@/app/components/SignInButton";
+import { IoMdLogOut } from "react-icons/io";
 
 export default function AuthButton() {
   const { data: session, status } = useSession();
@@ -11,15 +13,23 @@ export default function AuthButton() {
 
   if (session) {
     return (
-      <div>
-        <p>Welcome, {session.user?.name}</p>
-
-        <p>{session.user?.email}</p>
-
-        <button onClick={() => signOut()}>Sign out</button>
+      <div className="flex items-center">
+        <button
+          onClick={() => signOut()}
+          className="px-3 py-2 rounded-full hover:bg-zinc-800 flex items-center gap-2"
+        >
+          <span className="hidden md:block">Logout</span> <IoMdLogOut />
+        </button>
+        <Image
+          src={session.user?.image ?? "/default-avatar.png"}
+          alt="dp"
+          width={100}
+          height={100}
+          className="w-13"
+        />
       </div>
     );
   }
 
-  return <button onClick={() => signIn("google")}>Continue with Google</button>;
+  return <SignInButton />;
 }

@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // swcMinify: true,
   images: {
-    domains: ["res.cloudinary.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
   },
 };
 
