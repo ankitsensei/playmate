@@ -18,12 +18,12 @@ export default async function Home() {
               href={`/posts/${post.id}`}
               className="relative block aspect-video overflow-hidden"
             >
-              {/* <Image
+              <Image
                 src={post.image}
                 alt={post.title}
                 fill
                 className="object-cover transition duration-500 group-hover:scale-105"
-              /> */}
+              />
 
               {/* Image overlay */}
               <div className="absolute inset-0 bg-black/0 transition-all duration-300 group-hover:bg-black/10" />
@@ -48,7 +48,10 @@ export default async function Home() {
                 <p className="flex items-center gap-2">
                   <span>📅</span>
                   <span>
-                    {post.date.toDate().toLocaleDateString("en-IN", {
+                    {(typeof post.date === "string"
+                      ? new Date(post.date)
+                      : post.date.toDate()
+                    ).toLocaleDateString("en-IN", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",

@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import Data from "@/app/shared/Data";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { CldUploadWidget } from "next-cloudinary";
 import { createPost } from "@/app/shared/FirebaseConfig";
 
 type Inputs = {
@@ -28,6 +27,39 @@ const CreatePostPage = () => {
     watch,
     formState: { errors },
   } = useForm<Inputs>();
+  const [uploading, setUploading] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        console.error("Upload server error:", body);
+        throw new Error(body?.error || "Upload failed");
+      }
+
+      const { url } = await res.json();
+      setValue("image", url, { shouldValidate: true });
+      setImagePreview(url);
+    } catch (error) {
+      console.error("Upload error:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const postId = await createPost(data);
@@ -59,29 +91,30 @@ const CreatePostPage = () => {
               Image
             </label>
 
-            <CldUploadWidget
-              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-              onSuccess={(result) => {
-                if (
-                  typeof result.info === "object" &&
-                  "secure_url" in result.info
-                ) {
-                  setValue("image", result.info.secure_url, {
-                    shouldValidate: true,
-                  });
-                }
-              }}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full rounded-md border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-200 hover:bg-gray-800 disabled:opacity-50"
             >
-              {({ open }) => (
-                <button
-                  type="button"
-                  onClick={() => open()}
-                  className="w-full rounded-md border border-gray-700 bg-gray-900 px-4 py-3 text-sm text-gray-200 hover:bg-gray-800"
-                >
-                  Upload image
-                </button>
-              )}
-            </CldUploadWidget>
+              {uploading ? "Uploading..." : "Upload image"}
+            </button>
+
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="mt-2 h-40 w-full rounded-md object-cover"
+              />
+            )}
 
             <input
               type="hidden"
@@ -197,15 +230,10 @@ const CreatePostPage = () => {
 
             <select
               id="game"
-              name="game"
+              {...register("game", { required: true })}
               className="w-full rounded-md border border-gray-300 bg-black px-3 py-2.5 text-sm text-gray-200 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             >
-              <option
-                value="Badminton"
-                {...register("game", { required: true })}
-              >
-                Badminton
-              </option>
+              <option value="">Select a game</option>
 
               {Data.map((item) => (
                 <option key={item.id} value={item.name}>

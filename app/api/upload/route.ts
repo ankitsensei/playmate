@@ -1,13 +1,13 @@
 import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 export async function POST(request: Request) {
   try {
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
     const formData = await request.formData();
 
     const file = formData.get("file") as File;
@@ -37,8 +37,11 @@ export async function POST(request: Request) {
       url: (result as { secure_url: string }).secure_url,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Cloudinary upload error:", error);
 
-    return Response.json({ error: "Upload failed" }, { status: 500 });
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Upload failed" },
+      { status: 500 },
+    );
   }
 }
