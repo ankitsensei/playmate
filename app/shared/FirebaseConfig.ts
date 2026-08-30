@@ -1,5 +1,11 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { initializeApp, getApps } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,26 +16,32 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 
-export interface Post {
-  id: string;
-  title: string;
-  desc: string;
-  date: string;
-  location: string;
-  image: string;
-}
-
-export async function getPosts(): Promise<Post[]> {
-  const postsCollection = collection(db, "posts");
-
-  const postsSnapshot = await getDocs(postsCollection);
+export async function getPosts() {
+  const postsSnapshot = await getDocs(collection(db, "posts"));
 
   return postsSnapshot.docs.map((doc) => ({
     id: doc.id,
-    ...(doc.data() as Omit<Post, "id">),
+    ...doc.data(),
   }));
+}
+
+export async function createPost(data: {
+  title: string;
+  desc: string;
+  date: string;
+  zip: string;
+  location: string;
+  game: string;
+  image: string;
+}) {
+  const docRef = await addDoc(collection(db, "posts"), {
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+
+  return docRef.id;
 }
