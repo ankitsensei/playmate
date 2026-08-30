@@ -18,6 +18,9 @@ export interface Post {
   id: string;
   title: string;
   desc: string;
+  date: string;
+  location: string;
+  image: string;
 }
 
 export async function getPosts(): Promise<Post[]> {
