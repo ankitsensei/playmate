@@ -35,7 +35,7 @@ export default function SearchBar() {
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-10 mt-10">
+      <div className="flex items-center gap-4 mt-10">
         {Data.map((item) => (
           <div key={item.id} onClick={() => console.log(item.name)}>
             <Image
