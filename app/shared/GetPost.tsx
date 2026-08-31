@@ -148,7 +148,13 @@ export default async function Home() {
 
                 {/* MailMe */}
                 <div className="mt-auto">
-                  <MailMe />
+                  {/* <MailMe /> */}
+                  <a
+                    href={`mailto:${post.postedBy}`}
+                    className="truncate text-xs text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 sm:text-sm"
+                  >
+                    {post.postedBy}
+                  </a>
                 </div>
               </div>
             </article>
