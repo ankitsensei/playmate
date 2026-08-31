@@ -3,23 +3,20 @@ import React, { useRef } from "react";
 import Data from "@/app/shared/Data";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createPost } from "@/app/shared/FirebaseConfig";
+import { useSession } from "next-auth/react";
 
 type Inputs = {
   title: string;
   desc: string;
   date: string;
-  zip: string;
   location: string;
   game: string;
   image: string;
-
-  userId: string;
-  userName: string;
-  userImage: string;
-  createdAt: string;
+  postedBy: string;
 };
 
 const CreatePostPage = () => {
+  const { data: session } = useSession();
   const {
     register,
     handleSubmit,
@@ -62,7 +59,11 @@ const CreatePostPage = () => {
   };
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const postId = await createPost(data);
+      const postData = {
+        ...data,
+        postedBy: session?.user?.email || "unknown",
+      };
+      const postId = await createPost(postData);
 
       console.log("Post created:", postId);
     } catch (error) {
@@ -86,6 +87,7 @@ const CreatePostPage = () => {
 
         {/* Form */}
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          {/* <input type="hidden" {...register()} /> */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-200">
               Image
@@ -143,7 +145,7 @@ const CreatePostPage = () => {
               {...register("title", { required: true })}
               type="text"
               placeholder="Post title"
-              className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
@@ -161,13 +163,35 @@ const CreatePostPage = () => {
               {...register("desc", { required: true })}
               rows={4}
               placeholder="Write something..."
-              className="w-full resize-none rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full resize-none rounded-md border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
-          {/* Date + Zip */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <div>
+          {/* Date and Game */}
+          <div className="flex justify-between items-center gap-2">
+            <div className="w-1/2">
+              <label
+                htmlFor="game"
+                className="mb-1.5 block text-sm font-medium text-gray-200"
+              >
+                Game
+              </label>
+
+              <select
+                id="game"
+                {...register("game", { required: true })}
+                className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-gray-200 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="">Select a game</option>
+
+                {Data.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-1/2">
               <label
                 htmlFor="date"
                 className="mb-1.5 block text-sm font-medium text-gray-200"
@@ -179,24 +203,7 @@ const CreatePostPage = () => {
                 id="date"
                 {...register("date", { required: true })}
                 type="date"
-                className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-200 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="zip"
-                className="mb-1.5 block text-sm font-medium text-gray-200"
-              >
-                Zip
-              </label>
-
-              <input
-                id="zip"
-                {...register("zip", { required: true })}
-                type="text"
-                placeholder="Zip code"
-                className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-gray-200 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -215,38 +222,14 @@ const CreatePostPage = () => {
               {...register("location", { required: true })}
               type="text"
               placeholder="Where are you playing?"
-              className="w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-gray-200 placeholder-gray-400 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
-          </div>
-
-          {/* Game */}
-          <div>
-            <label
-              htmlFor="game"
-              className="mb-1.5 block text-sm font-medium text-gray-200"
-            >
-              Game
-            </label>
-
-            <select
-              id="game"
-              {...register("game", { required: true })}
-              className="w-full rounded-md border border-gray-300 bg-black px-3 py-2.5 text-sm text-gray-200 outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="">Select a game</option>
-
-              {Data.map((item) => (
-                <option key={item.id} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-md bg-blue-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="w-full rounded-md bg-blue-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Create post
           </button>
