@@ -33,10 +33,10 @@ export async function createPost(data: {
   title: string;
   desc: string;
   date: string;
-  zip: string;
   location: string;
   game: string;
   image: string;
+  postedBy: string;
 }) {
   const docRef = await addDoc(collection(db, "posts"), {
     ...data,
