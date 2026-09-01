@@ -7,6 +7,11 @@ import Tennis from "@/public/Images/Tennis.png";
 import Trekking from "@/public/Images/Trekking.png";
 const GameList = [
   {
+    id: 0,
+    name: "All",
+    image: null,
+  },
+  {
     id: 1,
     name: "Badminton",
     image: Badminton,

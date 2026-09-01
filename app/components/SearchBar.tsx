@@ -10,7 +10,9 @@ export default function SearchBar() {
   const activeGame = searchParams.get("game");
 
   const handleFilter = (gameName: string) => {
-    if (activeGame === gameName) {
+    if (gameName === "All") {
+      router.push("/");
+    } else if (activeGame === gameName) {
       router.push("/");
     } else {
       router.push(`/?game=${gameName}`);
@@ -49,24 +51,32 @@ export default function SearchBar() {
         </div>
       </div>
       <div className="flex items-center gap-4 mt-10">
-        {Data.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => handleFilter(item.name)}
-            className={`cursor-pointer transition-all duration-200 rounded-full p-1 ${
-              activeGame === item.name
-                ? "ring-2 ring-blue-500 ring-offset-2 scale-110"
-                : "hover:scale-125"
-            }`}
-          >
-            <Image
-              src={item.image}
-              alt={item.name}
-              width={50}
-              height={50}
-            />
-          </div>
-        ))}
+        {Data.map((item) => {
+          const isActive = item.name === "All" ? !activeGame : activeGame === item.name;
+
+          return (
+            <div
+              key={item.id}
+              onClick={() => handleFilter(item.name)}
+              className={`cursor-pointer transition-all duration-200 rounded-full ${
+                isActive
+                  ? "ring-2 ring-blue-500 ring-offset-2 scale-110"
+                  : "hover:scale-125"
+              } ${item.image ? "p-1" : "px-3 py-1 text-sm font-semibold text-blue-500 bg-blue-50 dark:bg-blue-900/30"}`}
+            >
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={50}
+                  height={50}
+                />
+              ) : (
+                <span>{item.name}</span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </>
   );
