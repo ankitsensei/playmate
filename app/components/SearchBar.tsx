@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,14 +9,25 @@ export default function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeGame = searchParams.get("game");
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
+
+  const buildUrl = (q?: string, game?: string | null) => {
+    const params = new URLSearchParams();
+    if (game) params.set("game", game);
+    if (q) params.set("q", q);
+    const qs = params.toString();
+    return qs ? `/?${qs}` : "/";
+  };
+
+  const handleSearch = () => {
+    router.push(buildUrl(query, activeGame));
+  };
 
   const handleFilter = (gameName: string) => {
-    if (gameName === "All") {
-      router.push("/");
-    } else if (activeGame === gameName) {
-      router.push("/");
+    if (gameName === "All" || activeGame === gameName) {
+      router.push(buildUrl(query));
     } else {
-      router.push(`/?game=${gameName}`);
+      router.push(buildUrl(query, gameName));
     }
   };
 
@@ -39,11 +51,14 @@ export default function SearchBar() {
             id="search"
             className="block w-full p-3 ps-9 bg-neutral-secondary-medium border rounded-lg border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body outline-none"
             placeholder="Search"
-            onChange={(e) => console.log(e.target.value)}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             required
           />
           <button
             type="button"
+            onClick={handleSearch}
             className="absolute end-1.5 bottom-1.5 bg-blue-500 text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded text-xs px-3 py-1.5 focus:outline-none"
           >
             Search

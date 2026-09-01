@@ -39,8 +39,14 @@ function EmptyState() {
   );
 }
 
-export default async function GetPost({ game }: { game?: string }) {
-  const posts = await getPosts(game);
+export default async function GetPost({
+  game,
+  search,
+}: {
+  game?: string;
+  search?: string;
+}) {
+  const posts = await getPosts(game, search);
 
   if (!posts.length) {
     return (

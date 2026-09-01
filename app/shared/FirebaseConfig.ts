@@ -33,15 +33,25 @@ export interface Post {
   postedBy: string;
 }
 
-export async function getPosts(game?: string): Promise<Post[]> {
+export async function getPosts(
+  game?: string,
+  search?: string,
+): Promise<Post[]> {
   const ref = collection(db, "posts");
   const q = game ? query(ref, where("game", "==", game)) : ref;
   const postsSnapshot = await getDocs(q);
 
-  return postsSnapshot.docs.map((doc) => ({
+  let posts = postsSnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Post[];
+
+  if (search) {
+    const term = search.toLowerCase();
+    posts = posts.filter((post) => post.title.toLowerCase().includes(term));
+  }
+
+  return posts;
 }
 
 export async function createPost(data: {
