@@ -21,7 +21,7 @@ const CreatePostPage = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>();
   const [uploading, setUploading] = React.useState(false);
@@ -66,6 +66,9 @@ const CreatePostPage = () => {
       const postId = await createPost(postData);
 
       console.log("Post created:", postId);
+      reset();
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to create post:", error);
     }
