@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/app/shared/FirebaseConfig";
+import DeletePostButton from "@/app/components/DeletePostButton";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -136,6 +137,7 @@ const MyPosts = async () => {
                       </div>
                     </div>
                   </div>
+                  <DeletePostButton postId={post.id} />
                 </article>
               );
             })}
