@@ -1,9 +1,22 @@
 "use client";
 import Image from "next/image";
 import { Search } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Data from "@/app/shared/Data";
 
 export default function SearchBar() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeGame = searchParams.get("game");
+
+  const handleFilter = (gameName: string) => {
+    if (activeGame === gameName) {
+      router.push("/");
+    } else {
+      router.push(`/?game=${gameName}`);
+    }
+  };
+
   return (
     <>
       <div className="text-center text-4xl mt-20 font-bold">
@@ -37,13 +50,20 @@ export default function SearchBar() {
       </div>
       <div className="flex items-center gap-4 mt-10">
         {Data.map((item) => (
-          <div key={item.id} onClick={() => console.log(item.name)}>
+          <div
+            key={item.id}
+            onClick={() => handleFilter(item.name)}
+            className={`cursor-pointer transition-all duration-200 rounded-full p-1 ${
+              activeGame === item.name
+                ? "ring-2 ring-blue-500 ring-offset-2 scale-110"
+                : "hover:scale-125"
+            }`}
+          >
             <Image
               src={item.image}
-              alt="item"
+              alt={item.name}
               width={50}
               height={50}
-              className="hover:scale-125"
             />
           </div>
         ))}

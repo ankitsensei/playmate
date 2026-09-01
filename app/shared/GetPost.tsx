@@ -39,8 +39,8 @@ function EmptyState() {
   );
 }
 
-export default async function Home() {
-  const posts = await getPosts();
+export default async function GetPost({ game }: { game?: string }) {
+  const posts = await getPosts(game);
 
   if (!posts.length) {
     return (

@@ -5,6 +5,8 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  query,
+  where,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -20,13 +22,26 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 
-export async function getPosts() {
-  const postsSnapshot = await getDocs(collection(db, "posts"));
+export interface Post {
+  id: string;
+  title: string;
+  desc: string;
+  date: string;
+  location: string;
+  game: string;
+  image: string;
+  postedBy: string;
+}
+
+export async function getPosts(game?: string): Promise<Post[]> {
+  const ref = collection(db, "posts");
+  const q = game ? query(ref, where("game", "==", game)) : ref;
+  const postsSnapshot = await getDocs(q);
 
   return postsSnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
-  }));
+  })) as Post[];
 }
 
 export async function createPost(data: {
