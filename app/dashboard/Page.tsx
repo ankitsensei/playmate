@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { auth, signOut } from "@/auth";
-import { IoMdLogOut } from "react-icons/io";
+import { auth } from "@/auth";
 import { IoCreate, IoDocuments } from "react-icons/io5";
 import Link from "next/link";
 import Image from "next/image";
+import LogoutButton from "@/app/components/LogoutButton";
 
 export default async function Dashboard() {
   const session = await auth();
@@ -87,20 +87,7 @@ export default async function Dashboard() {
 
         {/* Logout */}
         <section>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          >
-            <button
-              type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-red-900 dark:hover:bg-red-950 dark:hover:text-red-400"
-            >
-              <IoMdLogOut className="text-base" />
-              Logout
-            </button>
-          </form>
+          <LogoutButton />
         </section>
       </div>
     </main>
