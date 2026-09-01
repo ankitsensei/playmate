@@ -20,7 +20,7 @@ export default function AuthButton() {
             alt="dp"
             width={100}
             height={100}
-            className="w-13"
+            className="w-13 rounded-full"
           />
         </Link>
       </div>
